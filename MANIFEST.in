@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include costlow *.css
+recursive-include costlow *.csv
+recursive-include costlow *.html
+recursive-include costlow *.ico
+recursive-include costlow *.js
+recursive-include costlow *.json
+recursive-include costlow *.md
+recursive-include costlow *.png
+recursive-include costlow *.py
+recursive-include costlow *.svg
+recursive-include costlow *.txt
+recursive-exclude costlow *.pyc
