@@ -51,30 +51,13 @@ def check_password(user, pwd, doctype='User', fieldname='password'):
 	if not auth or not passlibctx.verify(pwd, auth[0].password):
 		frappe.msgprint("Incorrect User or Password", raise_exception=True)
 
-#		raise frappe.AuthenticationError(_('Incorrect User or Password'))
-
-	# lettercase agnostic
-#	user = auth[0].name
-#	delete_login_failed_cache(user)
-
 	return user
+
 # searches for leads which are not converted
 @frappe.whitelist()
-@frappe.validate_and_sanitize_search_inputs
-def lead_query(doctype, txt, searchfield, start, page_len, filters):
-    return frappe.db.sql("""
-        SELECT name, lead_name, company_name
-        FROM `tabLead`
-        WHERE docstatus &lt; 2
-            AND ifnull(status, '') != 'Converted'
-            AND ({key} LIKE %(txt)s
-                OR lead_name LIKE %(txt)s
-                OR company_name LIKE %(txt)s)
-            {mcond}
-        ORDER BY
-            IF(LOCATE(%(_txt)s, name), LOCATE(%(_txt)s, name), 99999),
-            IF(LOCATE(%(_txt)s, lead_name), LOCATE(%(_txt)s, lead_name), 99999),
-            IF(LOCATE(%(_txt)s, company_name), LOCATE(%(_txt)s, company_name), 99999),
-            name, lead_name
-        LIMIT %(start)s, %(page_len)s
-    """)
+def get_all_supervisors(doctype, txt, searchfield, start, page_len, filters):
+    return frappe.db.sql(""" SELECT tusr.name, thr.role
+		FROM `tabHas Role` thr, `tabUser` tusr
+		WHERE thr.parent = tusr.name
+		AND thr.role = %s
+		AND tusr.name <> "Administrator" """, ("System Manager",))
